@@ -35,16 +35,15 @@ Enter file in which to save the key (/home/username/.ssh/id_rsa):
 Enter passphrase (empty for no passphrase):
 ```
 
-#COPY KEY REMOTE
-Copy id_rsa.pub --->>> authorized_keys remote host
-```bash
-$ ssh-copy-id username@remote_host
-```
-OR
+#COPY KEY REMOTE (id_rsa.pub --->>> authorized_keys remote host)
 ```bash
 $ su - username
 $ mkdir -p ~/.ssh or /home/username/.ssh and touch /home/username/.ssh/authorized_keys
 
+$ ssh-copy-id username@remote_host
+```
+OR
+```bash
 $ cat ~/.ssh/id_rsa.pub | pbcopy
 $ vim ~/.ssh/authorized_keys - >> copy
 $ chmod -R go= ~/.ssh
