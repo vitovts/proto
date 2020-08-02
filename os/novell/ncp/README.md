@@ -46,14 +46,14 @@ Volume GW has been created.
 ```
 
 delete volume
-<code>
+```text
 mx1:/srv/www/novell/clients # ncpcon dismount volume gw1 
 ... Executing " dismount volume gw1"
 The following volume[s] were dismounted:
   GW1
 1 volume[s] were dismounted.
 ... completed OK [elapsed time = 11 msecs 665 usecs]
-</code>
+```
 
 Mount
 
