@@ -6,6 +6,10 @@ apt install -y openssh-server
 systemctl status ssh
 ```
 
+debian -->> sudo systemctl restart sshd
+
+
+
 #ADD USER (SUDO)
 ```bash
 $ adduser username
