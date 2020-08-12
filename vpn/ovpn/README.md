@@ -1,5 +1,17 @@
 Install and Configure OpenVPN to CentOS
 
+URL
+- https://github.com/OpenVPN/easy-rsa
+- https://github.com/OpenVPN/easy-rsa/releases/
+- 
+- https://www.dmosk.ru/instruktions.php?object=openvpn-centos-install
+- https://www.dmosk.ru/miniinstruktions.php?mini=router-centos
+- https://bozza.ru/art-269.html
+- https://winitpro.ru/index.php/2019/10/09/nastrojka-servera-openvpn-na-centos/
+- https://serveradmin.ru/nastroyka-openvpn-na-centos-7/
+
+
+
 OS
 ```bash
 cat /etc/redhat-release
@@ -147,8 +159,10 @@ This is going to take a long time
 ```
 
 #Варинт все сразу
-
-
+```bash
+./easyrsa  build-server-full vpnsrv nopass
+./easyrsa  build-client-full vpnclt nopass
+```
 
 #Для создания ta ключа используем команду:
 ```bash
@@ -229,7 +243,7 @@ Client config
 client
 resolv-retry infinite
 nobind
-remote 45.81.203.227 13001
+remote X.X.X.X X001
 proto udp
 dev tun
 comp-lzo
