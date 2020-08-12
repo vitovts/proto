@@ -187,8 +187,8 @@ mkdir /var/log/openvpn
 ```bash
 vim /etc/openvpn/server/server.conf
 
-#local 41.85.203.227
-port 13001
+#local X.X.X.X
+port X001
 proto udp
 dev tun
 
