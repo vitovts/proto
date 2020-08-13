@@ -220,7 +220,7 @@ tls-server
 comp-lzo
 ```
 
-#Start OpenVPN Service
+#Start and enable OpenVPN Service
 ```bash
 systemctl start openvpn-server@server
 systemctl enable openvpn-server@server
@@ -229,6 +229,12 @@ systemctl enable openvpn-server@server
 systemctl enable openvpn@server
 systemctl start openvpn@server
 ```
+```bash
+systemctl enable openvpn-server@client.service
+systemctl start openvpn-client@tap29
+```
+
+
 
 
 Проверим слушается ли порт 1194 сервисом:
