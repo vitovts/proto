@@ -84,7 +84,7 @@ PermitRootLogin yes
 #IgnoreUserKnownHosts no
 
 #To disable tunneled clear text passwords, change to no here!
-PasswordAuthentication yes
+>>PasswordAuthentication yes
 #PermitEmptyPasswords no
 
 # Change to yes to enable challenge-response passwords (beware issues with
@@ -109,7 +109,7 @@ ChallengeResponseAuthentication no
 # Set this to 'yes' to enable PAM authentication, account processing,
 # and session processing. If this is enabled, PAM authentication will
 # be allowed through the ChallengeResponseAuthentication and
- PasswordAuthentication.  Depending on your PAM configuration,
+# PasswordAuthentication.  Depending on your PAM configuration,
 # PAM authentication via ChallengeResponseAuthentication may bypass
 # the setting of "PermitRootLogin without-password".
 # If you just want the PAM account and session checks to run without
@@ -135,7 +135,7 @@ PrintMotd no
 #UseDNS no
 #PidFile /var/run/sshd.pid
 #MaxStartups 10:30:100
-PermitTunnel no
+>>PermitTunnel no
 #ChrootDirectory none
 #VersionAddendum none
 
