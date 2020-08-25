@@ -5,7 +5,8 @@ apt install \
      ca-certificates \
      curl \
      gnupg2 \
-     gnupg-agent\
+     gnupg-agent -y && \
+apt install \     
      software-properties-common -y && \
 curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | apt-key add - && \
 apt-key fingerprint 0EBFCD88 && \
