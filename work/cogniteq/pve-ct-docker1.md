@@ -15,6 +15,12 @@ swap: 512
 unprivileged: 1
 ```
 
+apt update -y
+
+apt-get install curl -y
+
+wget -O - https://raw.githubusercontent.com/vitovts/proto/master/work/cogniteq/docker-lxc-init-1.sh | bash
+
 ```
 apt update -y 
 apt-get install apt-transport-https ca-certificates curl gnupg-agent software-properties-common -y 
@@ -158,6 +164,14 @@ Subsystem       sftp    /usr/lib/openssh/sftp-server
 service ssh restart
 
 
+```
+Псевдографика
+    udo apt-get install dialog
 
 
+Опробовать его можно простой командой:
+
+    dialog --title " Уведомление " --msgbox "\n Свершилось что-то страшное!" 6 50
+
+```
 
