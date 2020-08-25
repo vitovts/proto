@@ -6,7 +6,7 @@ apt install \
      curl \
      gnupg2 \
      gnupg-agent -y && \
-apt install software-properties-common -y && \
+apt-get install software-properties-common && \
 curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | apt-key add - && \
 apt-key fingerprint 0EBFCD88 && \
 add-apt-repository \
