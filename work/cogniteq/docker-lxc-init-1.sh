@@ -1,12 +1,6 @@
 #!/usr/bin/env bash
 apt update && \
-apt install \
-     apt-transport-https \
-     ca-certificates \
-     curl \
-     gnupg2 \
-     gnupg-agent \
-     software-properties-common -y && \
+apt install apt-transport-https ca-certificates curl gnupg2 gnupg-agent software-properties-common -y && \
 curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | apt-key add - && \
 apt-key fingerprint 0EBFCD88 && \
 add-apt-repository \
