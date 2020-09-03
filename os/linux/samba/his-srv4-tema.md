@@ -1,58 +1,71 @@
-
+#PRE
+```
 yum update -y
-
-yum upgrde -y
-
-yum install mc vim -y
+yum install epel-release mc vim -y
 
 vim /etc/selinux/config 
 
-reboot
-
-yum install epel-release -y
+firewall-cmd --list-all
+firewall-cmd --permanent --remove-service=dhcpv6-client
+firewall-cmd --permanent --add-service=samba
+firewall-cmd --permanent --add-service=openvpn
+firewall-cmd --permanent --add-interface=tap29
+firewall-cmd --reload
+firewall-cmd --list-all
 
 yum update -y
+reboot
+```
 
-rpm -qa openvpn
-
-firewall-cmd --list-all
-
-firewall-cmd --permanent --remove-service=dhcpv6-client
-
-firewall-cmd --permanent --add-service=samba
-
-firewall-cmd --permanent --add-service=openvpn
-
-firewall-cmd --permanent --add-interface=tap29
-
-firewall-cmd --reload
-
-firewall-cmd --list-all
-
-systemctl start openvpn-client@tap29
-
-systemctl enable openvpn-client@tap29
-   
-   
+#REMOVE IPv6 + NetworkManager 
+```
 vim /etc/default/grub 
-
+cat-> ipv6.disable=1
+GRUB_CMDLINE_LINUX="ipv6.disable=1 crashkernel=auto rd.lvm.lv=centos/root rd.lvm.lv=centos/swap rhgb quiet"
 grub2-mkconfig -o /boot/grub2/grub.cfg 
+
+vim /etc/sysconfig/network-scripts/ifcfg-ens192
+BOOTPROTO="static"
 
 yum remove NetworkManager 
 
 reboot
+```
 
-systemctl start openvpn-client@tap29
-
+#DNS
+```
 vim /etc/resolv.conf 
 
-yum install chrony
+domain XXX.LOCAL
+search XXX.LOCAL
+nameserver X.X.X.X
+nameserver 8.8.8.8
+```
+
+
+#OpenVPN
+```
+rpm -qa openvpn
+yum install openvpn -y
+
+mkdir -p /var/log/openvpn/
+systemctl start openvpn-client@tun0
+systemctl enable openvpn-client@tun0
+```
+
+
+#TIME
+```
+yum install chrony -y
 
 vim /etc/chrony.conf
 
 systemctl start chronyd && systemctl enable chronyd
 
 systemctl status chronyd 
+```
+
+
 
 yum install realmd sssd sssd-libwbclient oddjob oddjob-mkhomedir adcli samba-common samba-common-tools
 
