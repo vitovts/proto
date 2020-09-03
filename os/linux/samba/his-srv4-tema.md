@@ -59,71 +59,133 @@ systemctl enable openvpn-client@tun0
 yum install chrony -y
 
 vim /etc/chrony.conf
+-->> server x.x.x.x iburst
 
 systemctl start chronyd && systemctl enable chronyd
-
 systemctl status chronyd 
 ```
 
-
-
+#INSTALL to ADDS
+```
 yum install realmd sssd sssd-libwbclient oddjob oddjob-mkhomedir adcli samba-common samba-common-tools
 
 vim /etc/hosts
-
 vim /etc/resolv.conf 
 
-realm discover cktema.lan
-
-realm join -U iqsupport CKTEMA.LAN
-
-id iqsupport@cktema.lan
+realm discover xxx.local
+realm join -U iqxxx XXX.LOCAL
+id iqxxx@xxx.localan
 
 realm list
 
-adcli info cktema.lan
+adcli info xxx.local
+```
 
-yum install samba
-
+#SAMBA
+```
+yum install samba -y
+```
 vim /etc/samba/smb.conf
+```
+[global]
+#charset
+        dos charset = cp866
+        unix charset = utf-8
 
+        workgroup = XXX
+        realm = XXX.LOCAL
+        security = ads
+
+        interfaces = lo tap29 172.16.0.0/16 10.0.0.0/8
+        interfaces = lo tun0 10.0.0.0/8
+        
+#       idmap config * : rangesize = 1000000
+        idmap config * : range = 1000000-19999999
+#       idmap config * : backend = autorid
+
+        template homedir = /home/%U
+        template shell = /bin/bash
+        kerberos method = secrets only
+        winbind use default domain = true
+        winbind offline logon = false
+
+#       encrypt passwords = yes
+        passdb backend = tdbsam
+
+        load printers = no
+        show add printer wizard = no
+
+printcap name = /dev/null
+        disable spoolss = yes
+
+        domain master = no
+        local master = no
+        preferred master = no
+        os level = 1
+
+        cups options = raw
+        #logs
+        log file = /var/log/samba/log.%m
+        log level =3
+        max log size = 500
+#       printing = cups
+
+
+[CKTEMA]
+        comment = Documents for CKTEMA
+        path = /mnt/cktema
+#       public = no
+#       guest ok = no
+#       valid users = @"Domain Users@cktema.lan", @"iqsupport@cktema.lan"
+#        writeable = yes
+#        browsable = yes
+ valid users = "@CKTEMA.LAN\Domain Users", root, iqsupport
+ read list = "@CKTEMA.LAN\Domain Users", root, iqsupport
+ write list = "@CKTEMA.LAN\Domain Users", root, iqsupport
+ read only = no
+#        admin users = "@CKTEMA\Администраторы домена",@"iqsupport@cktema.lan"
+        create mask = 0765
+#        directory mask = 0700
+```
+
+```
 systemctl start smb.service
 
 testparm
 
-mkdir /mnt/shara
+mkdir /mnt/xxx
 
-chmod 777 -R /mnt/shara
+chmod 777 -R /mnt/xxx
 
 realm list
 
 firewall-cmd --list-all
 
-systemctl start smb.service
-
+systemctl start smb.service && systemctl enable smb.service
 systemctl status smb.service
+```
 
+```
 yum install samba-winbind samba-winbind-clients samba pam_krb5 krb5-workstation chrony
+```
+```
+authconfig --enablekrb5 --krb5kdc=gkvtormet.local --krb5adminserver=gkvtormet.local --krb5realm=GKVTORMET.LOCAL --enablewinbind --enablewinbindauth --smbsecurity=ads --smbrealm=GKVTORMET.LOCAL --smbservers=gkvtormet.local --smbworkgroup=GKVTORMET --winbindtemplatehomedir=/home/%U --winbindtemplateshell=/bin/bash --enablemkhomedir --enablewinbindusedefaultdomain --update
+```
+```
+authconfig --enablekrb5 --krb5kdc=cktema.lan --krb5adminserver=cktema.lan --krb5realm=CKTEMA.LAN --enablewinbind --enablewinbindauth --smbsecurity=ads --smbrealm=CKTEMA.LAN --smbservers=cktema.lan --smbworkgroup=CKTEMA --winbindtemplatehomedir=/home/%U --winbindtemplateshell=/bin/bash --enablemkhomedir --enablewinbindusedefaultdomain --update
+```
 
-authconfig --enablekrb5 --krb5kdc=cktema.lan --krb5adminserver=cktema.lan.local --krb5realm=CKTEMA.LAN --enablewinbind --enablewinbindauth --smbsecurity=ads --smbrealm=CKTEMA.LAN --smbservers=cktema.lan --smbworkgroup=CKTEMA --winbindtemplatehomedir=/home/%U --winbindtemplateshell=/bin/bash --enablemkhomedir --enablewinbindusedefaultdomain --update
-
+```
 net ads join -U iqsupport
 
-systemctl start smb.service
+systemctl restart smb.service
 
 tail -f /var/log/samba/log.smbd 
 
 vim /etc/krb5.conf
 
-systemctl enable smb.service
-
-systemctl start winbind
-
-systemctl start smb.service
-
-systemctl enable winbind
-
-systemctl enable smb.service
+systemctl start winbind && systemctl enable winbind
+systemctl start smb.service && systemctl enable smb.service
 
 wbinfo -t
 
@@ -131,12 +193,18 @@ wbinfo -u
 
 wbinfo -g
 
-wbinfo -a CKTEMA\\iqsupport
+wbinfo -a XXX\\iqsupport
 
 id iqsupport
+```
 
+```
 chown iqsupport:'Domain Users' /mnt/shara
+## пользователи домена
+```
 
+
+```
 ll /mnt/
 
 fdisk -l
@@ -149,29 +217,25 @@ mkfs.ext4 /dev/sdb1
 
 fdisk -l
 
-mkdir -p /mnt/cktema
+mkdir -p /mnt/xxx
 
 ls -la /mnt/
 
 vim /etc/fstab 
-
-mount
-
-rm -r /mnt/sktema/
-
-vim /etc/fstab 
+-->> /dev/sdb1                       /mnt/xxx     ext4    defaults        0 0
 
 reboot
+```
 
 adcli info cktema.lan
 
 chown iqsupport:'Domain Users' /mnt/cktema
 
-chmod 0750 /mnt/cktema/
+chmod 0750 /mnt/xxx/
+chmod 777 -R /mnt/xxx/
+getfacl /mnt/xxx/
 
-getfacl /mnt/cktema/
 
-chmod 777 -R /mnt/cktema/
 
 chown iqsupport:'domain users' /mnt/cktema
 
