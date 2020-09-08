@@ -26,7 +26,7 @@ systemctl disable firewalld
 
 #Time
 ```bash
-yum install chrony
+yum install chronyvi
 ```
 ```bash
 vim /etc/chrony.conf 
@@ -283,8 +283,7 @@ wbinfo -g
 ```
 
 ```bash
-wbinfo -a XX\\adminXX
-plaintext password authentication succeeded
+wbinfo -a XX\\adminXX-
 challenge/response password authentication succeeded
 ```
 
