@@ -1,0 +1,153 @@
+Reverse Proxy Apache (Debian 8)
+
+URL
+https://httpd.apache.org/docs/current/mod/mod_proxy.html
+
+
+
+1. Install
+aptitude install -y build-essential
+aptitude install -y libapache2-mod-proxy-html libxml2-dev
+aptitude install -y apache2
+
+2. Активируем следующие модули:
+
+    a2enmod proxy
+    a2enmod proxy_http
+    a2enmod proxy_ajp
+    a2enmod rewrite
+    a2enmod deflate
+    a2enmod headers
+    a2enmod proxy_balancer
+    a2enmod proxy_html
+    a2enmod proxy_ftp
+    a2enmod proxy_connect
+    a2enmod ssl
+
+2.1 Рестартуем Apache    service apache2 restart
+
+3. Apach’у для правильной работы не хватает модуля mod_xml2enc, НО! в Jessie этот модуль не работает, нам последовательно нужно внести следующие комманды:
+
+    aptitude install apache2-prefork-dev libxml2 libxml2-dev apache2-dev
+    mkdir ~/modbuild/ && cd ~/modbuild/
+    wget http://apache.webthing.com/svn/apache/filters/mod_xml2enc.c
+    wget http://apache.webthing.com/svn/apache/filters/mod_xml2enc.h
+    apxs2 -aic -I/usr/include/libxml2 ./mod_xml2enc.c
+    cd ~
+    rm -rfd ~/modbuild/
+    service apache2 restart
+
+
+4. Так как мы хотим опубликовать HTTPS сайт, до того момента пока мы не установим Let’s Encrypt, нам нужно сделать самоподписанный сертификат для нашего сайта, вводим комманду:
+
+    mkdir /etc/apache2/ssl
+    cd /etc/apache2/ssl
+    openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout server.key -out server.crt
+
+5. Создать файл конфигурации и назвать его понятным именем:
+
+    touch /etc/apache2/sites-available/sambi4.conf
+
+5.1 Содержание:
+
+    <VirtualHost *:80>
+    ServerName cc.dev2.cogniteq.com
+    Redirect permanent / https://cc.dev2.cogniteq.com/
+    </VirtualHost>
+    <VirtualHost *:443>
+    SSLEngine On
+    SSLProxyEngine On
+    ProxyRequests Off
+    ProxyPreserveHost On
+    ProxyVia full
+
+    SSLCertificateFile /etc/apache2/ssl/cc/server.crt #указываем путь к нашему самоподписанному сертификату
+    SSLCertificateKeyFile /etc/apache2/ssl/cc/server.key #указываем путь к нашему самоподписанному сертификату
+
+    ProxyHTMLInterp On
+    ProxyHTMLExtended On
+
+    <proxy *>
+    Order deny,allow
+    Allow from all
+    </proxy>
+
+    ProxyPass / https://10.172.1.17:80/
+    ProxyPassReverse / https://10.172.1.17:80/
+    ServerName cc.dev2.cogniteq.com
+    ServerAdmin admin@cc.dev2.cogniteq.com
+    DocumentRoot «/var/www/html» #эта строка нужна для того чтобы апач запустился, без нее запуска не будет, т.к. ему нужно на что-то ссылаться.
+    </VirtualHost>
+
+5.2 После завершения создания, не забываем включить наш файл
+
+    a2ensite /etc/apache2/sites-available/cc.conf
+
+6. Разница между SSLCertificateFile и SSLCertificateChainFile?
+
+   Listen 443 
+
+   SSLCertificateFile /home/web/certs/domain1.public.crt
+   SSLCertificateKeyFile /home/web/certs/domain1.private.key
+   SSLCertificateChainFile /home/web/certs/domain1.intermediate.crt
+
+https://qastack.ru/server/382633/difference-between-sslcertificatefile-and-sslcertificatechainfile
+
+7. Пример 1 – Обратное проксирование сервера
+
+   /etc/apache2/sites-available/000-default.conf
+
+   <VirtualHost *:80>
+    ProxyPreserveHost On
+
+    ProxyPass / http://127.0.0.1:8080/
+    ProxyPassReverse / http://127.0.0.1:8080/
+   </VirtualHost>
+
+Если вы следовали вместе с серверами например, на шаге 2, используйте 127.0.0.1:8080 как написано в блоке выше. 
+Если у вас есть свои собственные серверы приложений, использовать их адреса.
+
+Есть три директивы здесь:
+- ProxyPreserveHost 
+ делает Apache передают оригинальный Host заголовок на внутренний сервер. Это полезно, так как это делает сервер бэкенд осознаный адрес, используемый для доступа к приложению.
+- ProxyPass 
+главная директива конфигурации прокси. В этом случае, он указывает, что все в корневом URL ( /) должен быть отображен на внутренний сервер по указанному адресу. 
+Например, если Apache получает запрос на /example, он будет подключаться и вернет ответ на оригинальный клиент. http://your_backend_server/example
+- ProxyPassReverse должен иметь ту же конфигурацию, что и ProxyPass. Это говорит Apache, чтобы изменить заголовки ответа от сервера бэкэнда. 
+Это гарантирует, что если внутренний сервер возвращает заголовок перенаправления местоположения, браузер клиента будет перенаправлен на адрес прокси – сервера
+и не адреса сервера, бэкенда, который не будет работать, как предполагалось.
+
+Теперь, если вы получаете доступ к http://your_server_ip через веб – браузер, вы увидите ответ сервера бэкэнда вместо стандартной страницы приветствия Apache. 
+
+8. Пример 2 – балансировки нагрузки между несколькими серверами Backend
+
+Если у вас есть несколько внутренних серверов, хороший способ распределить трафик между ними, 
+когда проксирование заключается в использовании балансировки нагрузки функции mod_proxy.
+
+Замените все содержимое внутри блока VirtualHost следующим, так что ваш файл конфигурации выглядит следующим образом:
+/etc/apache2/sites-available/000-default.conf
+
+<VirtualHost *:80>
+<Proxy balancer://mycluster>
+    BalancerMember http://127.0.0.1:8080
+    BalancerMember http://127.0.0.1:8081
+</Proxy>
+
+    ProxyPreserveHost On
+
+    ProxyPass / balancer://mycluster/
+    ProxyPassReverse / balancer://mycluster/
+</VirtualHost>
+
+Конфигурация аналогична предыдущей, но вместо указания одного сервера бэкэнд напрямую, мы использовали дополнительный блок Proxy для определения нескольких серверов. 
+Блок с именем balancer://mycluster (имя может быть свободно изменено) и состоит из одного или нескольких BalancerMember, которые определяют, 
+лежащие в основе адреса бэкенда сервера. ProxyPass и директива ProxyPassReverse  используют пул балансировки нагрузки с именем mycluster вместо конкретного сервера.
+
+Если вы следовали примеру на шаге 2, используя 127.0.0.1:8080 и 127.0.0.1:8081 для директивы BalancerMember, как написано в блоке выше. 
+Если у вас есть свои собственные серверы приложений, используйте их адреса вместо этих.
+
+Зайдите в веб – браузере по адресу http://your_server_ip, вы увидите бэкэнд сервера вместо стандартной страницы Apache. 
+То есть обратный прокси – сервер работал и балансировка нагрузки между обоими серверами.
+
+
+
