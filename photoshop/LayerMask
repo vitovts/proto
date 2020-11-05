@@ -2,10 +2,10 @@ Layer Mask (Маска слоя)- это трафарет привезанный
 
 
 - Layer Mask (растровая)
- - Reveal All
- - Hide All
- - Reveal Selection
- - Hide Selection
+ - Reveal All - белая
+ - Hide All  - черная
+ - Reveal Selection - убрать края
+ - Hide Selection - убрать внутренность
  - From Transparency (делать маску из прозрачности слоя)
 
  - Enable
@@ -18,3 +18,12 @@ Layer Mask (Маска слоя)- это трафарет привезанный
  
  - Enable
  - Unlink
+
+
+
+
+
+Корректирующие слои
+- Создать кривые - инвертировать маску (с белого в черный)
+- Быстрая маска - Кисть - Закрыть быструю маску
+- Создать кривые - далее менять
