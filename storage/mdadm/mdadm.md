@@ -1,7 +1,7 @@
 #mdadm
 
 
-``
+```
 # apt install mdadm
 ```
 
