@@ -1,5 +1,6 @@
 #mdadm
 
+[Содержание](../storage.md)
 
 ```
 # apt install mdadm
