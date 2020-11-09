@@ -1,6 +1,6 @@
 #fdisk
 
-[Содержание](/../README.md)
+[Содержание](../storage.md)
 
 1. Add a New Disk to an Existing Linux Server
 
