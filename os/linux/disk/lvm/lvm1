@@ -1,0 +1,7 @@
+Storage types
+- file level storage
+- block level storage
+
+pvcreate /dev/sd[cb]
+vgcreate sas /dev/sd[cb]
+lvcreate -L100000 sas --name lv01
