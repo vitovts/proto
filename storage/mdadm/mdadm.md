@@ -89,7 +89,7 @@ md0 : active raid1 sdc[1]
 unused devices: <none>
 ```
 
-``
+```
 # mdadm /dev/md0 --add /dev/sdb   
 ```
 ```
