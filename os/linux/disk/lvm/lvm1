@@ -5,3 +5,8 @@ Storage types
 pvcreate /dev/sd[cb]
 vgcreate sas /dev/sd[cb]
 lvcreate -L100000 sas --name lv01
+
+
+mkfs.ext4 /dev/sas/lv01
+mkdir /mnt/lv01
+mount /dev/sas/lv01 /mnt/lv01
